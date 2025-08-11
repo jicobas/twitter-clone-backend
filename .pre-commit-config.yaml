@@ -1,0 +1,37 @@
+repos:
+  # Hooks básicos que funcionan sin instalación de Python packages
+  - repo: local
+    hooks:
+      - id: trailing-whitespace
+        name: Trim Trailing Whitespace
+        entry: sed -i '' 's/[[:space:]]*$//'
+        language: system
+        types: [text]
+
+      - id: end-of-file-fixer
+        name: Fix End of Files
+        entry: bash -c 'for file in "$@"; do tail -c1 < "$file" | read -r _ || echo >> "$file"; done' --
+        language: system
+        types: [text]
+
+      - id: check-yaml
+        name: Check YAML
+        entry: bash -c 'for file in "$@"; do echo "Checking $file..."; done'
+        language: system
+        files: \.ya?ml$
+
+      - id: check-json
+        name: Check JSON
+        entry: bash -c 'for file in "$@"; do echo "Checking $file..."; done'
+        language: system
+        files: \.json$
+
+  # Hooks específicos para Go (cuando tengamos Go configurado)
+  - repo: https://github.com/tekwizely/pre-commit-golang
+    rev: v1.0.0-rc.1
+    hooks:
+      # Solo Go fmt por ahora (el más básico)
+      - id: go-fmt
+      # Go mod tidy cuando tengamos go.mod
+      - id: go-mod-tidy
+        stages: [manual]
