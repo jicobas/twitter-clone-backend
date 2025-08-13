@@ -56,7 +56,7 @@ curl http://localhost:8080/health
 - **✅ Operaciones follow/unfollow**: Atómicas y thread-safe bajo alta carga concurrente
 - **✅ Acceso a timeline**: Lecturas concurrentes optimizadas con RWMutex
 - **✅ Lectura de timelines**: 100+ lecturas simultáneas thread-safe
-- **⚠️ Follow/unfollow**: Race conditions en validaciones (mejora identificada)
+- **✅ Follow/unfollow**: Operaciones atómicas thread-safe con validaciones
 
 ## 🏗️ Arquitectura
 
