@@ -7,7 +7,7 @@ import (
 	"twitter-clone-backend/internal/usecases"
 )
 
-// Handlers contiene todos los manejadores HTTP
+// Handlers contiene los manejadores HTTP
 type Handlers struct {
 	tweetUseCase  *usecases.TweetUseCase
 	followUseCase *usecases.FollowUseCase

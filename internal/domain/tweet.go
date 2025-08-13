@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// generateID genera un ID único simple
+// generateID genera un ID único
 func generateID() string {
 	b := make([]byte, 16)
 	rand.Read(b)

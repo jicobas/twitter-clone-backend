@@ -7,7 +7,7 @@ import (
 	"twitter-clone-backend/internal/domain"
 )
 
-// Repositories implementa todos los repositorios en memoria
+// Repositories implementa los repositorios en memoria
 type Repositories struct {
 	tweets  map[string]*domain.Tweet
 	users   map[string]*domain.User

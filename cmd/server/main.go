@@ -18,7 +18,7 @@ func main() {
 	appLogger := logger.NewLogger()
 	appLogger.Info("Starting Twitter Clone Backend", "port", cfg.Port, "storage", cfg.StorageType)
 
-	// Inicializar repositorios (por ahora solo memory)
+	// Inicializar repositorios
 	repo := memory.NewRepositories()
 
 	// Inicializar casos de uso

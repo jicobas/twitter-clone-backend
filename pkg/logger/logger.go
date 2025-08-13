@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-// SimpleLogger implementa una versión simple del logger
+// SimpleLogger implementa un logger personalizado
 type SimpleLogger struct {
 	infoLogger  *log.Logger
 	errorLogger *log.Logger
