@@ -2,14 +2,14 @@ package domain
 
 import "time"
 
-// User representa un usuario en el sistema
+// User represents a user in the system
 type User struct {
 	ID        string    `json:"id"`
 	Username  string    `json:"username"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
-// NewUser crea un nuevo usuario
+// NewUser creates a new user
 func NewUser(id, username string) *User {
 	return &User{
 		ID:        id,
@@ -18,7 +18,7 @@ func NewUser(id, username string) *User {
 	}
 }
 
-// IsValid verifica si el usuario es válido
+// IsValid verifies if the user is valid
 func (u *User) IsValid() bool {
 	return u.ID != "" && u.Username != ""
 }

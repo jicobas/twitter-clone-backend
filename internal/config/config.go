@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-// Config contiene toda la configuración de la aplicación
+// Config contains all application configuration
 type Config struct {
 	Port        string
 	StorageType string
@@ -14,7 +14,7 @@ type Config struct {
 	EnableCache bool
 }
 
-// LoadConfig carga la configuración desde variables de entorno
+// LoadConfig loads configuration from environment variables
 func LoadConfig() *Config {
 	return &Config{
 		Port:        getEnv("PORT", "8080"),
@@ -25,7 +25,7 @@ func LoadConfig() *Config {
 	}
 }
 
-// getEnv obtiene una variable de entorno con valor por defecto
+// getEnv gets an environment variable with default value
 func getEnv(key, defaultValue string) string {
 	if value := os.Getenv(key); value != "" {
 		return value
@@ -33,7 +33,7 @@ func getEnv(key, defaultValue string) string {
 	return defaultValue
 }
 
-// getEnvAsBool obtiene una variable de entorno como boolean
+// getEnvAsBool gets an environment variable as boolean
 func getEnvAsBool(key string, defaultValue bool) bool {
 	if value := os.Getenv(key); value != "" {
 		if result, err := strconv.ParseBool(value); err == nil {

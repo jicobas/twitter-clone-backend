@@ -6,7 +6,7 @@ import (
 	"twitter-clone-backend/internal/ports"
 )
 
-// TweetUseCase maneja la lógica de negocio relacionada con tweets
+// TweetUseCase handles business logic related to tweets
 type TweetUseCase struct {
 	tweetRepo  ports.TweetRepository
 	followRepo ports.FollowRepository
@@ -15,7 +15,7 @@ type TweetUseCase struct {
 	logger     ports.Logger
 }
 
-// NewTweetUseCase crea una nueva instancia del caso de uso
+// NewTweetUseCase creates a new instance of the use case
 func NewTweetUseCase(
 	tweetRepo ports.TweetRepository,
 	followRepo ports.FollowRepository,
@@ -32,9 +32,9 @@ func NewTweetUseCase(
 	}
 }
 
-// CreateTweet crea un nuevo tweet
+// CreateTweet creates a new tweet
 func (uc *TweetUseCase) CreateTweet(ctx context.Context, userID, content string) (*domain.Tweet, error) {
-	// Verificar que el usuario existe
+	// Verify that the user exists
 	exists, err := uc.userRepo.Exists(ctx, userID)
 	if err != nil {
 		uc.logger.Error("failed to check user existence", err, "userID", userID)
@@ -44,19 +44,19 @@ func (uc *TweetUseCase) CreateTweet(ctx context.Context, userID, content string)
 		return nil, domain.ErrUserNotFound
 	}
 
-	// Crear el tweet
+	// Create the tweet
 	tweet, err := domain.NewTweet(userID, content)
 	if err != nil {
 		return nil, err
 	}
 
-	// Persistir el tweet
+	// Persist the tweet
 	if err := uc.tweetRepo.Create(ctx, tweet); err != nil {
 		uc.logger.Error("failed to create tweet", err, "tweetID", tweet.ID)
 		return nil, err
 	}
 
-	// Invalidar cache de timeline de seguidores
+	// Invalidate followers' timeline cache
 	if uc.cache != nil {
 		uc.invalidateFollowersTimeline(ctx, userID)
 	}
@@ -65,13 +65,13 @@ func (uc *TweetUseCase) CreateTweet(ctx context.Context, userID, content string)
 	return tweet, nil
 }
 
-// GetTimeline obtiene el timeline de un usuario
+// GetTimeline gets a user's timeline
 func (uc *TweetUseCase) GetTimeline(ctx context.Context, userID string, limit int) ([]*domain.Tweet, error) {
 	if limit <= 0 || limit > domain.MaxTimelineLimit {
 		limit = domain.MaxTimelineLimit
 	}
 
-	// Intentar obtener del cache primero
+	// Try to get from cache first
 	if uc.cache != nil {
 		tweets, err := uc.cache.GetTimeline(ctx, userID)
 		if err == nil && tweets != nil {
@@ -80,24 +80,24 @@ func (uc *TweetUseCase) GetTimeline(ctx context.Context, userID string, limit in
 		}
 	}
 
-	// Obtener usuarios que sigue
+	// Get users being followed
 	following, err := uc.followRepo.GetFollowing(ctx, userID)
 	if err != nil {
 		uc.logger.Error("failed to get following users", err, "userID", userID)
 		return nil, err
 	}
 
-	// Incluir tweets del propio usuario
+	// Include tweets from the user themselves
 	following = append(following, userID)
 
-	// Obtener tweets del timeline
+	// Get timeline tweets
 	tweets, err := uc.tweetRepo.GetTimeline(ctx, following, limit)
 	if err != nil {
 		uc.logger.Error("failed to get timeline", err, "userID", userID)
 		return nil, err
 	}
 
-	// Guardar en cache
+	// Save to cache
 	if uc.cache != nil {
 		if err := uc.cache.SetTimeline(ctx, userID, tweets); err != nil {
 			uc.logger.Warn("failed to cache timeline", "error", err, "userID", userID)
@@ -108,7 +108,7 @@ func (uc *TweetUseCase) GetTimeline(ctx context.Context, userID string, limit in
 	return tweets, nil
 }
 
-// GetUserTweets obtiene todos los tweets de un usuario específico
+// GetUserTweets gets all tweets from a specific user
 func (uc *TweetUseCase) GetUserTweets(ctx context.Context, userID string) ([]*domain.Tweet, error) {
 	tweets, err := uc.tweetRepo.GetByUserID(ctx, userID)
 	if err != nil {
@@ -120,7 +120,7 @@ func (uc *TweetUseCase) GetUserTweets(ctx context.Context, userID string) ([]*do
 	return tweets, nil
 }
 
-// invalidateFollowersTimeline invalida el cache de timeline de los seguidores
+// invalidateFollowersTimeline invalidates the timeline cache of followers
 func (uc *TweetUseCase) invalidateFollowersTimeline(ctx context.Context, userID string) {
 	followers, err := uc.followRepo.GetFollowers(ctx, userID)
 	if err != nil {

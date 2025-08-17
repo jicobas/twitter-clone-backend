@@ -23,7 +23,7 @@ func TestConcurrentTweetCreation(t *testing.T) {
 	var wg sync.WaitGroup
 	ctx := context.Background()
 
-	// Función que crea tweets concurrentemente
+	// Function that creates tweets concurrently
 	createTweets := func(userID string, startIndex int) {
 		defer wg.Done()
 		for i := 0; i < tweetsPerGoroutine; i++ {
@@ -35,7 +35,7 @@ func TestConcurrentTweetCreation(t *testing.T) {
 		}
 	}
 
-	// Ejecutar goroutines concurrentes
+	// Execute concurrent goroutines
 	wg.Add(numGoroutines)
 	for i := 0; i < numGoroutines; i++ {
 		go createTweets("user1", i*tweetsPerGoroutine)
@@ -43,7 +43,7 @@ func TestConcurrentTweetCreation(t *testing.T) {
 
 	wg.Wait()
 
-	// Verificar que se crearon todos los tweets
+	// Verify that all tweets were created
 	tweets, err := tweetUseCase.GetUserTweets(ctx, "user1")
 	if err != nil {
 		t.Fatalf("Error getting user tweets: %v", err)
@@ -68,7 +68,7 @@ func TestConcurrentFollowOperations(t *testing.T) {
 	var successfulFollows int32
 	var successfulUnfollows int32
 
-	// Test 1: Múltiples goroutines intentando hacer follow a la misma relación
+	// Test 1: Multiple goroutines trying to follow the same relationship
 	wg.Add(numGoroutines)
 	for i := 0; i < numGoroutines; i++ {
 		go func() {
@@ -81,12 +81,12 @@ func TestConcurrentFollowOperations(t *testing.T) {
 	}
 	wg.Wait()
 
-	// Solo debería haber exactamente 1 follow exitoso
+	// There should be exactly 1 successful follow
 	if successfulFollows != 1 {
 		t.Errorf("Expected exactly 1 successful follow, got %d", successfulFollows)
 	}
 
-	// Verificar que efectivamente está siguiendo
+	// Verify that they are indeed following
 	isFollowing, err := followUseCase.IsFollowing(ctx, "user1", "user2")
 	if err != nil {
 		t.Fatalf("Error checking follow status: %v", err)
@@ -95,7 +95,7 @@ func TestConcurrentFollowOperations(t *testing.T) {
 		t.Error("Expected user1 to be following user2")
 	}
 
-	// Test 2: Múltiples goroutines intentando hacer unfollow
+	// Test 2: Multiple goroutines trying to unfollow
 	wg.Add(numGoroutines)
 	for i := 0; i < numGoroutines; i++ {
 		go func() {
@@ -108,12 +108,12 @@ func TestConcurrentFollowOperations(t *testing.T) {
 	}
 	wg.Wait()
 
-	// Solo debería haber exactamente 1 unfollow exitoso
+	// There should be exactly 1 successful unfollow
 	if successfulUnfollows != 1 {
 		t.Errorf("Expected exactly 1 successful unfollow, got %d", successfulUnfollows)
 	}
 
-	// Verificar que efectivamente ya no está siguiendo
+	// Verify that they are indeed no longer following
 	isFollowing, err = followUseCase.IsFollowing(ctx, "user1", "user2")
 	if err != nil {
 		t.Fatalf("Error checking follow status: %v", err)
@@ -132,7 +132,7 @@ func TestConcurrentTimelineAccess(t *testing.T) {
 
 	ctx := context.Background()
 
-	// Crear algunos tweets
+	// Create some tweets
 	for i := 0; i < 10; i++ {
 		content := fmt.Sprintf("Test tweet %d", i)
 		_, err := tweetUseCase.CreateTweet(ctx, "user1", content)
@@ -141,7 +141,7 @@ func TestConcurrentTimelineAccess(t *testing.T) {
 		}
 	}
 
-	// Follow user1 desde user2
+	// Follow user1 from user2
 	err := followUseCase.FollowUser(ctx, "user2", "user1")
 	if err != nil {
 		t.Fatalf("Error following user: %v", err)
@@ -150,7 +150,7 @@ func TestConcurrentTimelineAccess(t *testing.T) {
 	const numGoroutines = 100
 	var wg sync.WaitGroup
 
-	// Función que lee timeline concurrentemente
+	// Function that reads timeline concurrently
 	readTimeline := func(userID string) {
 		defer wg.Done()
 		_, err := tweetUseCase.GetTimeline(ctx, userID, 50)
@@ -159,7 +159,7 @@ func TestConcurrentTimelineAccess(t *testing.T) {
 		}
 	}
 
-	// Ejecutar lecturas concurrentes
+	// Execute concurrent reads
 	wg.Add(numGoroutines)
 	for i := 0; i < numGoroutines; i++ {
 		go readTimeline("user2")

@@ -6,7 +6,7 @@ import (
 	"twitter-clone-backend/internal/ports"
 )
 
-// FollowUseCase maneja la lógica de negocio relacionada con seguimientos
+// FollowUseCase handles business logic related to following
 type FollowUseCase struct {
 	followRepo ports.FollowRepository
 	userRepo   ports.UserRepository
@@ -14,7 +14,7 @@ type FollowUseCase struct {
 	logger     ports.Logger
 }
 
-// NewFollowUseCase crea una nueva instancia del caso de uso
+// NewFollowUseCase creates a new instance of the use case
 func NewFollowUseCase(
 	followRepo ports.FollowRepository,
 	userRepo ports.UserRepository,
@@ -29,15 +29,15 @@ func NewFollowUseCase(
 	}
 }
 
-// FollowUser permite a un usuario seguir a otro
+// FollowUser allows a user to follow another user
 func (uc *FollowUseCase) FollowUser(ctx context.Context, followerID, followeeID string) error {
-	// Validar la relación de seguimiento
+	// Validate the follow relationship
 	follow, err := domain.NewFollow(followerID, followeeID)
 	if err != nil {
 		return err
 	}
 
-	// Verificar que ambos usuarios existen
+	// Verify that both users exist
 	followerExists, err := uc.userRepo.Exists(ctx, followerID)
 	if err != nil {
 		uc.logger.Error("failed to check follower existence", err, "followerID", followerID)
@@ -56,7 +56,7 @@ func (uc *FollowUseCase) FollowUser(ctx context.Context, followerID, followeeID 
 		return domain.ErrUserNotFound
 	}
 
-	// Operación atómica: verificar + crear en una sola transacción
+	// Atomic operation: verify + create in a single transaction
 	if err := uc.followRepo.FollowIfNotExists(ctx, follow.FollowerID, follow.FolloweeID); err != nil {
 		if err == domain.ErrAlreadyFollowing {
 			return err
@@ -65,7 +65,7 @@ func (uc *FollowUseCase) FollowUser(ctx context.Context, followerID, followeeID 
 		return err
 	}
 
-	// Invalidar cache del timeline del seguidor
+	// Invalidate follower's timeline cache
 	if uc.cache != nil {
 		if err := uc.cache.InvalidateTimeline(ctx, followerID); err != nil {
 			uc.logger.Warn("failed to invalidate timeline cache", "error", err, "followerID", followerID)
@@ -76,7 +76,7 @@ func (uc *FollowUseCase) FollowUser(ctx context.Context, followerID, followeeID 
 	return nil
 }
 
-// UnfollowUser permite a un usuario dejar de seguir a otro
+// UnfollowUser allows a user to stop following another user
 func (uc *FollowUseCase) UnfollowUser(ctx context.Context, followerID, followeeID string) error {
 	if followerID == "" || followeeID == "" {
 		return domain.ErrInvalidUserID
@@ -86,7 +86,7 @@ func (uc *FollowUseCase) UnfollowUser(ctx context.Context, followerID, followeeI
 		return domain.ErrCannotFollowSelf
 	}
 
-	// Operación atómica: verificar + eliminar en una sola transacción
+	// Atomic operation: verify + delete in a single transaction
 	if err := uc.followRepo.UnfollowIfExists(ctx, followerID, followeeID); err != nil {
 		if err == domain.ErrNotFollowing {
 			return err
@@ -95,7 +95,7 @@ func (uc *FollowUseCase) UnfollowUser(ctx context.Context, followerID, followeeI
 		return err
 	}
 
-	// Invalidar cache del timeline del seguidor
+	// Invalidate follower's timeline cache
 	if uc.cache != nil {
 		if err := uc.cache.InvalidateTimeline(ctx, followerID); err != nil {
 			uc.logger.Warn("failed to invalidate timeline cache", "error", err, "followerID", followerID)
@@ -106,7 +106,7 @@ func (uc *FollowUseCase) UnfollowUser(ctx context.Context, followerID, followeeI
 	return nil
 }
 
-// GetFollowers obtiene la lista de seguidores de un usuario
+// GetFollowers gets the list of followers for a user
 func (uc *FollowUseCase) GetFollowers(ctx context.Context, userID string) ([]string, error) {
 	if userID == "" {
 		return nil, domain.ErrInvalidUserID
@@ -122,7 +122,7 @@ func (uc *FollowUseCase) GetFollowers(ctx context.Context, userID string) ([]str
 	return followers, nil
 }
 
-// GetFollowing obtiene la lista de usuarios que sigue un usuario
+// GetFollowing gets the list of users that a user follows
 func (uc *FollowUseCase) GetFollowing(ctx context.Context, userID string) ([]string, error) {
 	if userID == "" {
 		return nil, domain.ErrInvalidUserID
@@ -138,7 +138,7 @@ func (uc *FollowUseCase) GetFollowing(ctx context.Context, userID string) ([]str
 	return following, nil
 }
 
-// IsFollowing verifica si un usuario está siguiendo a otro
+// IsFollowing verifies if a user is following another user
 func (uc *FollowUseCase) IsFollowing(ctx context.Context, followerID, followeeID string) (bool, error) {
 	if followerID == "" || followeeID == "" {
 		return false, domain.ErrInvalidUserID

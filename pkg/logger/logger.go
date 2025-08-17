@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-// SimpleLogger implementa un logger personalizado
+// SimpleLogger implements a custom logger
 type SimpleLogger struct {
 	infoLogger  *log.Logger
 	errorLogger *log.Logger
@@ -14,7 +14,7 @@ type SimpleLogger struct {
 	warnLogger  *log.Logger
 }
 
-// NewLogger crea una nueva instancia del logger
+// NewLogger creates a new logger instance
 func NewLogger() *SimpleLogger {
 	return &SimpleLogger{
 		infoLogger:  log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile),
@@ -24,7 +24,7 @@ func NewLogger() *SimpleLogger {
 	}
 }
 
-// Info registra un mensaje informativo
+// Info logs an informative message
 func (l *SimpleLogger) Info(msg string, args ...interface{}) {
 	if len(args) > 0 {
 		msg = fmt.Sprintf("%s %v", msg, args)
@@ -32,7 +32,7 @@ func (l *SimpleLogger) Info(msg string, args ...interface{}) {
 	l.infoLogger.Println(msg)
 }
 
-// Error registra un mensaje de error
+// Error logs an error message
 func (l *SimpleLogger) Error(msg string, err error, args ...interface{}) {
 	errorMsg := fmt.Sprintf("%s: %v", msg, err)
 	if len(args) > 0 {
@@ -41,7 +41,7 @@ func (l *SimpleLogger) Error(msg string, err error, args ...interface{}) {
 	l.errorLogger.Println(errorMsg)
 }
 
-// Debug registra un mensaje de debug
+// Debug logs a debug message
 func (l *SimpleLogger) Debug(msg string, args ...interface{}) {
 	if len(args) > 0 {
 		msg = fmt.Sprintf("%s %v", msg, args)
@@ -49,7 +49,7 @@ func (l *SimpleLogger) Debug(msg string, args ...interface{}) {
 	l.debugLogger.Println(msg)
 }
 
-// Warn registra un mensaje de advertencia
+// Warn logs a warning message
 func (l *SimpleLogger) Warn(msg string, args ...interface{}) {
 	if len(args) > 0 {
 		msg = fmt.Sprintf("%s %v", msg, args)

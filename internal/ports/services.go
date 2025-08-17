@@ -5,14 +5,14 @@ import (
 	"twitter-clone-backend/internal/domain"
 )
 
-// CacheService define las operaciones de cache
+// CacheService defines cache operations
 type CacheService interface {
 	GetTimeline(ctx context.Context, userID string) ([]*domain.Tweet, error)
 	SetTimeline(ctx context.Context, userID string, tweets []*domain.Tweet) error
 	InvalidateTimeline(ctx context.Context, userID string) error
 }
 
-// Logger define las operaciones de logging
+// Logger defines logging operations
 type Logger interface {
 	Info(msg string, args ...interface{})
 	Error(msg string, err error, args ...interface{})

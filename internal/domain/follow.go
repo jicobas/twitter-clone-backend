@@ -2,14 +2,14 @@ package domain
 
 import "time"
 
-// Follow representa una relación de seguimiento entre usuarios
+// Follow represents a following relationship between users
 type Follow struct {
-	FollowerID string    `json:"follower_id"` // Usuario que sigue
-	FolloweeID string    `json:"followee_id"` // Usuario que es seguido
+	FollowerID string    `json:"follower_id"` // User who follows
+	FolloweeID string    `json:"followee_id"` // User who is followed
 	CreatedAt  time.Time `json:"created_at"`
 }
 
-// NewFollow crea una nueva relación de seguimiento
+// NewFollow creates a new following relationship
 func NewFollow(followerID, followeeID string) (*Follow, error) {
 	if followerID == "" || followeeID == "" {
 		return nil, ErrInvalidUserID
@@ -26,7 +26,7 @@ func NewFollow(followerID, followeeID string) (*Follow, error) {
 	}, nil
 }
 
-// IsValid verifica si la relación de seguimiento es válida
+// IsValid verifies if the following relationship is valid
 func (f *Follow) IsValid() bool {
 	return f.FollowerID != "" &&
 		f.FolloweeID != "" &&

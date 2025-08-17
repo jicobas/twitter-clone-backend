@@ -7,7 +7,7 @@ import (
 	"twitter-clone-backend/internal/domain"
 )
 
-// Repositories implementa los repositorios en memoria
+// Repositories implements repositories in memory
 type Repositories struct {
 	tweets  map[string]*domain.Tweet
 	users   map[string]*domain.User
@@ -15,7 +15,7 @@ type Repositories struct {
 	mu      sync.RWMutex
 }
 
-// NewRepositories crea una nueva instancia de repositorios en memoria
+// NewRepositories creates a new instance of in-memory repositories
 func NewRepositories() *Repositories {
 	repo := &Repositories{
 		tweets:  make(map[string]*domain.Tweet),
@@ -23,13 +23,13 @@ func NewRepositories() *Repositories {
 		follows: make(map[string]map[string]bool),
 	}
 
-	// Agregar algunos usuarios de ejemplo para testing
+	// Add some example users for testing
 	repo.seedUsers()
 
 	return repo
 }
 
-// seedUsers agrega usuarios de ejemplo
+// seedUsers adds example users
 func (r *Repositories) seedUsers() {
 	users := []*domain.User{
 		domain.NewUser("user1", "alice"),
@@ -75,7 +75,7 @@ func (r *Repositories) GetByUserID(ctx context.Context, userID string) ([]*domai
 		}
 	}
 
-	// Ordenar por fecha de creación (más reciente primero)
+	// Sort by creation date (most recent first)
 	sort.Slice(tweets, func(i, j int) bool {
 		return tweets[i].CreatedAt.After(tweets[j].CreatedAt)
 	})
@@ -99,12 +99,12 @@ func (r *Repositories) GetTimeline(ctx context.Context, userIDs []string, limit 
 		}
 	}
 
-	// Ordenar por fecha de creación (más reciente primero)
+	// Sort by creation date (most recent first)
 	sort.Slice(tweets, func(i, j int) bool {
 		return tweets[i].CreatedAt.After(tweets[j].CreatedAt)
 	})
 
-	// Aplicar límite
+	// Apply limit
 	if limit > 0 && len(tweets) > limit {
 		tweets = tweets[:limit]
 	}
@@ -142,12 +142,12 @@ func (r *Repositories) FollowIfNotExists(ctx context.Context, followerID, follow
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	// Verificar atómicamente si ya está siguiendo
+	// Atomically verify if already following
 	if r.follows[followerID] != nil && r.follows[followerID][followeeID] {
 		return domain.ErrAlreadyFollowing
 	}
 
-	// Si no existe, crear la relación
+	// If it doesn't exist, create the relationship
 	if r.follows[followerID] == nil {
 		r.follows[followerID] = make(map[string]bool)
 	}
@@ -174,12 +174,12 @@ func (r *Repositories) UnfollowIfExists(ctx context.Context, followerID, followe
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	// Verificar atómicamente si está siguiendo
+	// Atomically verify if following
 	if r.follows[followerID] == nil || !r.follows[followerID][followeeID] {
 		return domain.ErrNotFollowing
 	}
 
-	// Si existe, eliminarlo
+	// If it exists, delete it
 	delete(r.follows[followerID], followeeID)
 	if len(r.follows[followerID]) == 0 {
 		delete(r.follows, followerID)

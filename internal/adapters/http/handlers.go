@@ -7,13 +7,13 @@ import (
 	"twitter-clone-backend/internal/usecases"
 )
 
-// Handlers contiene los manejadores HTTP
+// Handlers contains HTTP handlers
 type Handlers struct {
 	tweetUseCase  *usecases.TweetUseCase
 	followUseCase *usecases.FollowUseCase
 }
 
-// NewHandlers crea una nueva instancia de los manejadores
+// NewHandlers creates a new instance of handlers
 func NewHandlers(tweetUseCase *usecases.TweetUseCase, followUseCase *usecases.FollowUseCase) *Handlers {
 	return &Handlers{
 		tweetUseCase:  tweetUseCase,
@@ -53,19 +53,19 @@ type FollowingResponse struct {
 	Following []string `json:"following"`
 }
 
-// writeJSON escribe una respuesta JSON
+// writeJSON writes a JSON response
 func writeJSON(w http.ResponseWriter, status int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	json.NewEncoder(w).Encode(data)
 }
 
-// writeError escribe una respuesta de error JSON
+// writeError writes a JSON error response
 func writeError(w http.ResponseWriter, status int, message string) {
 	writeJSON(w, status, ErrorResponse{Error: message})
 }
 
-// CreateTweet maneja la creación de un nuevo tweet
+// CreateTweet handles the creation of a new tweet
 func (h *Handlers) CreateTweet(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
@@ -110,14 +110,14 @@ func (h *Handlers) CreateTweet(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, response)
 }
 
-// GetTimeline obtiene el timeline de un usuario
+// GetTimeline gets a user's timeline
 func (h *Handlers) GetTimeline(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
 		return
 	}
 
-	// Extraer userID del path (asumiendo formato /timeline/{userID})
+	// Extract userID from path (assuming format /timeline/{userID})
 	userID := r.URL.Path[len("/api/v1/timeline/"):]
 	if userID == "" {
 		writeError(w, http.StatusBadRequest, "userID parameter is required")
@@ -125,7 +125,7 @@ func (h *Handlers) GetTimeline(w http.ResponseWriter, r *http.Request) {
 	}
 
 	limitStr := r.URL.Query().Get("limit")
-	limit := 50 // valor por defecto
+	limit := 50 // default value
 	if limitStr != "" {
 		if parsedLimit, err := strconv.Atoi(limitStr); err == nil {
 			limit = parsedLimit
@@ -151,14 +151,14 @@ func (h *Handlers) GetTimeline(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, response)
 }
 
-// GetUserTweets obtiene todos los tweets de un usuario
+// GetUserTweets gets all tweets from a user
 func (h *Handlers) GetUserTweets(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
 		return
 	}
 
-	// Extraer userID del path (asumiendo formato /tweets/user/{userID})
+	// Extract userID from path (assuming format /tweets/user/{userID})
 	userID := r.URL.Path[len("/api/v1/tweets/user/"):]
 	if userID == "" {
 		writeError(w, http.StatusBadRequest, "userID parameter is required")
@@ -184,7 +184,7 @@ func (h *Handlers) GetUserTweets(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, response)
 }
 
-// FollowUser permite a un usuario seguir a otro
+// FollowUser allows a user to follow another user
 func (h *Handlers) FollowUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
@@ -217,7 +217,7 @@ func (h *Handlers) FollowUser(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, MessageResponse{Message: "successfully followed user"})
 }
 
-// UnfollowUser permite a un usuario dejar de seguir a otro
+// UnfollowUser allows a user to stop following another user
 func (h *Handlers) UnfollowUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodDelete {
 		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
@@ -230,7 +230,7 @@ func (h *Handlers) UnfollowUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Extraer followeeID del path (asumiendo formato /follow/{followeeID})
+	// Extract followeeID from path (assuming format /follow/{followeeID})
 	followeeID := r.URL.Path[len("/api/v1/follow/"):]
 	if followeeID == "" {
 		writeError(w, http.StatusBadRequest, "followeeID parameter is required")
@@ -246,14 +246,14 @@ func (h *Handlers) UnfollowUser(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, MessageResponse{Message: "successfully unfollowed user"})
 }
 
-// GetFollowers obtiene los seguidores de un usuario
+// GetFollowers gets the followers of a user
 func (h *Handlers) GetFollowers(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
 		return
 	}
 
-	// Extraer userID del path (asumiendo formato /users/{userID}/followers)
+	// Extract userID from path (assuming format /users/{userID}/followers)
 	path := r.URL.Path
 	userID := ""
 	if len(path) > len("/api/v1/users/") {
@@ -277,14 +277,14 @@ func (h *Handlers) GetFollowers(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, FollowersResponse{Followers: followers})
 }
 
-// GetFollowing obtiene los usuarios que sigue un usuario
+// GetFollowing gets the users that a user follows
 func (h *Handlers) GetFollowing(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
 		return
 	}
 
-	// Extraer userID del path (asumiendo formato /users/{userID}/following)
+	// Extract userID from path (assuming format /users/{userID}/following)
 	path := r.URL.Path
 	userID := ""
 	if len(path) > len("/api/v1/users/") {

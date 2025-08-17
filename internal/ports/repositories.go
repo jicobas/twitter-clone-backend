@@ -5,7 +5,7 @@ import (
 	"twitter-clone-backend/internal/domain"
 )
 
-// TweetRepository define las operaciones para tweets
+// TweetRepository defines operations for tweets
 type TweetRepository interface {
 	Create(ctx context.Context, tweet *domain.Tweet) error
 	GetByID(ctx context.Context, id string) (*domain.Tweet, error)
@@ -14,7 +14,7 @@ type TweetRepository interface {
 	Delete(ctx context.Context, id string) error
 }
 
-// FollowRepository define las operaciones relacionadas con seguimientos
+// FollowRepository defines operations related to following
 type FollowRepository interface {
 	Follow(ctx context.Context, followerID, followeeID string) error
 	FollowIfNotExists(ctx context.Context, followerID, followeeID string) error
@@ -25,7 +25,7 @@ type FollowRepository interface {
 	IsFollowing(ctx context.Context, followerID, followeeID string) (bool, error)
 }
 
-// UserRepository define las operaciones para usuarios
+// UserRepository defines operations for users
 type UserRepository interface {
 	CreateUser(ctx context.Context, user *domain.User) error
 	GetUserByID(ctx context.Context, id string) (*domain.User, error)

@@ -6,14 +6,14 @@ import (
 	"time"
 )
 
-// generateID genera un ID único
+// generateID generates a unique ID
 func generateID() string {
 	b := make([]byte, 16)
 	rand.Read(b)
 	return fmt.Sprintf("%x", b)
 }
 
-// Tweet representa un tweet en el sistema
+// Tweet represents a tweet in the system
 type Tweet struct {
 	ID        string    `json:"id"`
 	UserID    string    `json:"user_id"`
@@ -21,7 +21,7 @@ type Tweet struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-// NewTweet crea un nuevo tweet con validaciones
+// NewTweet creates a new tweet with validations
 func NewTweet(userID, content string) (*Tweet, error) {
 	if userID == "" {
 		return nil, ErrInvalidUserID
@@ -43,7 +43,7 @@ func NewTweet(userID, content string) (*Tweet, error) {
 	}, nil
 }
 
-// IsValid verifica si el tweet es válido
+// IsValid verifies if the tweet is valid
 func (t *Tweet) IsValid() bool {
 	return t.ID != "" &&
 		t.UserID != "" &&

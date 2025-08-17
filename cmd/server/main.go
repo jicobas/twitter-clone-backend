@@ -11,27 +11,27 @@ import (
 )
 
 func main() {
-	// Cargar configuración
+	// Load configuration
 	cfg := config.LoadConfig()
 
-	// Inicializar logger
+	// Initialize logger
 	appLogger := logger.NewLogger()
 	appLogger.Info("Starting Twitter Clone Backend", "port", cfg.Port, "storage", cfg.StorageType)
 
-	// Inicializar repositorios
+	// Initialize repositories
 	repo := memory.NewRepositories()
 
-	// Inicializar casos de uso
+	// Initialize use cases
 	tweetUseCase := usecases.NewTweetUseCase(repo, repo, repo, nil, appLogger)
 	followUseCase := usecases.NewFollowUseCase(repo, repo, nil, appLogger)
 
-	// Inicializar handlers HTTP
+	// Initialize HTTP handlers
 	handlers := httpAdapters.NewHandlers(tweetUseCase, followUseCase)
 
-	// Configurar rutas
+	// Configure routes
 	router := httpAdapters.SetupRoutes(handlers)
 
-	// Iniciar servidor
+	// Start server
 	appLogger.Info("Server starting", "port", cfg.Port)
 	if err := http.ListenAndServe(":"+cfg.Port, router); err != nil {
 		log.Fatal("Failed to start server:", err)
