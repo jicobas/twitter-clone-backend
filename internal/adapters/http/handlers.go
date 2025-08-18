@@ -67,11 +67,6 @@ func writeError(w http.ResponseWriter, status int, message string) {
 
 // CreateTweet handles the creation of a new tweet
 func (h *Handlers) CreateTweet(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
-		return
-	}
-
 	userID := r.Header.Get("X-User-ID")
 	if userID == "" {
 		writeError(w, http.StatusBadRequest, "X-User-ID header is required")
@@ -112,13 +107,16 @@ func (h *Handlers) CreateTweet(w http.ResponseWriter, r *http.Request) {
 
 // GetTimeline gets a user's timeline
 func (h *Handlers) GetTimeline(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
-		return
+	// Extract userID from path (format: /users/{userID}/timeline)
+	path := r.URL.Path
+	userID := ""
+	if len(path) > len("/users/") {
+		endIndex := len(path) - len("/timeline")
+		if endIndex > len("/users/") {
+			userID = path[len("/users/"):endIndex]
+		}
 	}
 
-	// Extract userID from path (assuming format /timeline/{userID})
-	userID := r.URL.Path[len("/api/v1/timeline/"):]
 	if userID == "" {
 		writeError(w, http.StatusBadRequest, "userID parameter is required")
 		return
@@ -153,13 +151,16 @@ func (h *Handlers) GetTimeline(w http.ResponseWriter, r *http.Request) {
 
 // GetUserTweets gets all tweets from a user
 func (h *Handlers) GetUserTweets(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
-		return
+	// Extract userID from path (format: /users/{userID}/tweets)
+	path := r.URL.Path
+	userID := ""
+	if len(path) > len("/users/") {
+		endIndex := len(path) - len("/tweets")
+		if endIndex > len("/users/") {
+			userID = path[len("/users/"):endIndex]
+		}
 	}
 
-	// Extract userID from path (assuming format /tweets/user/{userID})
-	userID := r.URL.Path[len("/api/v1/tweets/user/"):]
 	if userID == "" {
 		writeError(w, http.StatusBadRequest, "userID parameter is required")
 		return
@@ -186,11 +187,6 @@ func (h *Handlers) GetUserTweets(w http.ResponseWriter, r *http.Request) {
 
 // FollowUser allows a user to follow another user
 func (h *Handlers) FollowUser(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
-		return
-	}
-
 	followerID := r.Header.Get("X-User-ID")
 	if followerID == "" {
 		writeError(w, http.StatusBadRequest, "X-User-ID header is required")
@@ -219,19 +215,14 @@ func (h *Handlers) FollowUser(w http.ResponseWriter, r *http.Request) {
 
 // UnfollowUser allows a user to stop following another user
 func (h *Handlers) UnfollowUser(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodDelete {
-		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
-		return
-	}
-
 	followerID := r.Header.Get("X-User-ID")
 	if followerID == "" {
 		writeError(w, http.StatusBadRequest, "X-User-ID header is required")
 		return
 	}
 
-	// Extract followeeID from path (assuming format /follow/{followeeID})
-	followeeID := r.URL.Path[len("/api/v1/follow/"):]
+	// Extract followeeID from path (format: /users/following/{followeeID})
+	followeeID := r.URL.Path[len("/users/following/"):]
 	if followeeID == "" {
 		writeError(w, http.StatusBadRequest, "followeeID parameter is required")
 		return
@@ -248,18 +239,13 @@ func (h *Handlers) UnfollowUser(w http.ResponseWriter, r *http.Request) {
 
 // GetFollowers gets the followers of a user
 func (h *Handlers) GetFollowers(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
-		return
-	}
-
-	// Extract userID from path (assuming format /users/{userID}/followers)
+	// Extract userID from path (format: /users/{userID}/followers)
 	path := r.URL.Path
 	userID := ""
-	if len(path) > len("/api/v1/users/") {
+	if len(path) > len("/users/") {
 		endIndex := len(path) - len("/followers")
-		if endIndex > len("/api/v1/users/") {
-			userID = path[len("/api/v1/users/"):endIndex]
+		if endIndex > len("/users/") {
+			userID = path[len("/users/"):endIndex]
 		}
 	}
 
@@ -279,18 +265,13 @@ func (h *Handlers) GetFollowers(w http.ResponseWriter, r *http.Request) {
 
 // GetFollowing gets the users that a user follows
 func (h *Handlers) GetFollowing(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		writeError(w, http.StatusMethodNotAllowed, "Method not allowed")
-		return
-	}
-
-	// Extract userID from path (assuming format /users/{userID}/following)
+	// Extract userID from path (format: /users/{userID}/following)
 	path := r.URL.Path
 	userID := ""
-	if len(path) > len("/api/v1/users/") {
+	if len(path) > len("/users/") {
 		endIndex := len(path) - len("/following")
-		if endIndex > len("/api/v1/users/") {
-			userID = path[len("/api/v1/users/"):endIndex]
+		if endIndex > len("/users/") {
+			userID = path[len("/users/"):endIndex]
 		}
 	}
 

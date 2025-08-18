@@ -1,16 +1,14 @@
 package domain
 
 import (
-	"crypto/rand"
-	"fmt"
 	"time"
+
+	"github.com/google/uuid"
 )
 
-// generateID generates a unique ID
+// generateID generates a unique ID using UUID v4
 func generateID() string {
-	b := make([]byte, 16)
-	rand.Read(b)
-	return fmt.Sprintf("%x", b)
+	return uuid.New().String()
 }
 
 // Tweet represents a tweet in the system

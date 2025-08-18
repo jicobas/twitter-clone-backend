@@ -56,9 +56,9 @@ func (uc *TweetUseCase) CreateTweet(ctx context.Context, userID, content string)
 		return nil, err
 	}
 
-	// Invalidate followers' timeline cache
+	// Invalidate followers' timeline cache asynchronously (not critical path)
 	if uc.cache != nil {
-		uc.invalidateFollowersTimeline(ctx, userID)
+		go uc.invalidateFollowersTimeline(context.Background(), userID)
 	}
 
 	uc.logger.Info("tweet created successfully", "tweetID", tweet.ID, "userID", userID)
@@ -97,11 +97,13 @@ func (uc *TweetUseCase) GetTimeline(ctx context.Context, userID string, limit in
 		return nil, err
 	}
 
-	// Save to cache
+	// Save to cache asynchronously (not critical path for current response)
 	if uc.cache != nil {
-		if err := uc.cache.SetTimeline(ctx, userID, tweets); err != nil {
-			uc.logger.Warn("failed to cache timeline", "error", err, "userID", userID)
-		}
+		go func() {
+			if err := uc.cache.SetTimeline(context.Background(), userID, tweets); err != nil {
+				uc.logger.Warn("failed to cache timeline", "error", err, "userID", userID)
+			}
+		}()
 	}
 
 	uc.logger.Info("timeline retrieved", "userID", userID, "tweetsCount", len(tweets))

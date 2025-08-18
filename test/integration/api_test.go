@@ -62,7 +62,7 @@ func TestAPI(t *testing.T) {
 
 		jsonData, _ := json.Marshal(tweetData)
 
-		req, _ := http.NewRequest("POST", baseURL+"/api/v1/tweets", bytes.NewBuffer(jsonData))
+		req, _ := http.NewRequest("POST", baseURL+"/tweets", bytes.NewBuffer(jsonData))
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("X-User-ID", "user1")
 
@@ -81,7 +81,7 @@ func TestAPI(t *testing.T) {
 
 	// Test 3: Get timeline
 	t.Run("Get timeline", func(t *testing.T) {
-		resp, err := http.Get(baseURL + "/api/v1/timeline/user1")
+		resp, err := http.Get(baseURL + "/users/user1/timeline")
 		if err != nil {
 			t.Fatalf("Failed to get timeline: %v", err)
 		}
@@ -100,7 +100,7 @@ func TestAPI(t *testing.T) {
 
 		jsonData, _ := json.Marshal(followData)
 
-		req, _ := http.NewRequest("POST", baseURL+"/api/v1/follow", bytes.NewBuffer(jsonData))
+		req, _ := http.NewRequest("POST", baseURL+"/users/following", bytes.NewBuffer(jsonData))
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("X-User-ID", "user1")
 
@@ -119,7 +119,7 @@ func TestAPI(t *testing.T) {
 
 	// Test 5: Get followers
 	t.Run("Get followers", func(t *testing.T) {
-		resp, err := http.Get(baseURL + "/api/v1/users/user2/followers")
+		resp, err := http.Get(baseURL + "/users/user2/followers")
 		if err != nil {
 			t.Fatalf("Failed to get followers: %v", err)
 		}

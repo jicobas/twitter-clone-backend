@@ -76,33 +76,51 @@ curl http://localhost:8080/health
 
 ## 📡 API Endpoints
 
+**🔄 Actualizado: Endpoints limpios y RESTful**
+
 **Autenticación:** Header `X-User-ID: user1` (usuarios pre-creados: user1, user2, user3)
 
 ### Tweets
 ```bash
 # Crear tweet
-POST /api/v1/tweets
+POST /tweets
 {"content": "Hello World!"}
 
 # Timeline (tweets propios + seguidos)
-GET /api/v1/timeline/{userID}?limit=50
+GET /users/{userID}/timeline?limit=50
 
 # Tweets de usuario específico
-GET /api/v1/tweets/user/{userID}
+GET /users/{userID}/tweets
 ```
 
 ### Seguimientos
 ```bash
 # Seguir usuario
-POST /api/v1/follow
+POST /users/following
 {"followee_id": "user2"}
 
 # Dejar de seguir
-DELETE /api/v1/follow/{followeeID}
+DELETE /users/following/{followeeID}
 
 # Ver seguidores/siguiendo
-GET /api/v1/users/{userID}/followers
-GET /api/v1/users/{userID}/following
+GET /users/{userID}/followers
+GET /users/{userID}/following
+```
+
+### Comparación con X API real:
+
+| **Endpoint** | **Nuestra API** | **X API v2** | **✅ Estado** |
+|--------------|----------------|--------------|----------------|
+| Crear tweet | `POST /tweets` | `POST /2/tweets` | 🔄 Simplificado |
+| Usuario tweets | `GET /users/{id}/tweets` | `GET /2/users/{id}/tweets` | 🔄 Simplificado |
+| Timeline | `GET /users/{id}/timeline` | `GET /2/users/{id}/timelines/reverse_chronological` | 🔄 Simplificado |
+| Seguidores | `GET /users/{id}/followers` | `GET /2/users/{id}/followers` | 🔄 Simplificado |
+| Siguiendo | `GET /users/{id}/following` | `GET /2/users/{id}/following` | 🔄 Simplificado |
+| Seguir | `POST /users/following` | `POST /2/users/{id}/following` | 🔄 Simplificado |
+
+# Ver seguidores/siguiendo
+GET /users/{userID}/followers
+GET /users/{userID}/following
 ```
 
 ### Health Check
@@ -343,17 +361,25 @@ MongoDB permite **escalar horizontalmente** manteniendo la flexibilidad de esque
 
 ```bash
 # 1. Crear tweet
-curl -X POST http://localhost:8080/api/v1/tweets \
+curl -X POST http://localhost:8080/tweets \
   -H "X-User-ID: user1" \
+  -H "Content-Type: application/json" \
   -d '{"content": "Mi primer tweet!"}'
 
 # 2. Seguir usuario
-curl -X POST http://localhost:8080/api/v1/follow \
+curl -X POST http://localhost:8080/users/following \
   -H "X-User-ID: user1" \
+  -H "Content-Type: application/json" \
   -d '{"followee_id": "user2"}'
 
 # 3. Ver timeline
-curl http://localhost:8080/api/v1/timeline/user1
+curl http://localhost:8080/users/user1/timeline
+
+# 4. Ver tweets de un usuario
+curl http://localhost:8080/users/user2/tweets
+
+# 5. Ver seguidores
+curl http://localhost:8080/users/user2/followers
 ```
 
 ## 🔧 Stack Tecnológico

@@ -65,11 +65,13 @@ func (uc *FollowUseCase) FollowUser(ctx context.Context, followerID, followeeID 
 		return err
 	}
 
-	// Invalidate follower's timeline cache
+	// Invalidate follower's timeline cache asynchronously (not critical path)
 	if uc.cache != nil {
-		if err := uc.cache.InvalidateTimeline(ctx, followerID); err != nil {
-			uc.logger.Warn("failed to invalidate timeline cache", "error", err, "followerID", followerID)
-		}
+		go func() {
+			if err := uc.cache.InvalidateTimeline(context.Background(), followerID); err != nil {
+				uc.logger.Warn("failed to invalidate timeline cache", "error", err, "followerID", followerID)
+			}
+		}()
 	}
 
 	uc.logger.Info("user followed successfully", "followerID", followerID, "followeeID", followeeID)
@@ -95,11 +97,13 @@ func (uc *FollowUseCase) UnfollowUser(ctx context.Context, followerID, followeeI
 		return err
 	}
 
-	// Invalidate follower's timeline cache
+	// Invalidate follower's timeline cache asynchronously (not critical path)
 	if uc.cache != nil {
-		if err := uc.cache.InvalidateTimeline(ctx, followerID); err != nil {
-			uc.logger.Warn("failed to invalidate timeline cache", "error", err, "followerID", followerID)
-		}
+		go func() {
+			if err := uc.cache.InvalidateTimeline(context.Background(), followerID); err != nil {
+				uc.logger.Warn("failed to invalidate timeline cache", "error", err, "followerID", followerID)
+			}
+		}()
 	}
 
 	uc.logger.Info("user unfollowed successfully", "followerID", followerID, "followeeID", followeeID)
