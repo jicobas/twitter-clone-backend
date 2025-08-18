@@ -65,6 +65,21 @@ func writeError(w http.ResponseWriter, status int, message string) {
 	writeJSON(w, status, ErrorResponse{Error: message})
 }
 
+// extractUserIDFromPath extracts userID from paths like /users/{userID}/timeline, /users/{userID}/tweets, etc.
+func extractUserIDFromPath(path, suffix string) string {
+	prefix := "/users/"
+	if len(path) <= len(prefix) {
+		return ""
+	}
+
+	endIndex := len(path) - len(suffix)
+	if endIndex <= len(prefix) {
+		return ""
+	}
+
+	return path[len(prefix):endIndex]
+}
+
 // CreateTweet handles the creation of a new tweet
 func (h *Handlers) CreateTweet(w http.ResponseWriter, r *http.Request) {
 	userID := r.Header.Get("X-User-ID")
@@ -108,14 +123,7 @@ func (h *Handlers) CreateTweet(w http.ResponseWriter, r *http.Request) {
 // GetTimeline gets a user's timeline
 func (h *Handlers) GetTimeline(w http.ResponseWriter, r *http.Request) {
 	// Extract userID from path (format: /users/{userID}/timeline)
-	path := r.URL.Path
-	userID := ""
-	if len(path) > len("/users/") {
-		endIndex := len(path) - len("/timeline")
-		if endIndex > len("/users/") {
-			userID = path[len("/users/"):endIndex]
-		}
-	}
+	userID := extractUserIDFromPath(r.URL.Path, "/timeline")
 
 	if userID == "" {
 		writeError(w, http.StatusBadRequest, "userID parameter is required")
@@ -152,14 +160,7 @@ func (h *Handlers) GetTimeline(w http.ResponseWriter, r *http.Request) {
 // GetUserTweets gets all tweets from a user
 func (h *Handlers) GetUserTweets(w http.ResponseWriter, r *http.Request) {
 	// Extract userID from path (format: /users/{userID}/tweets)
-	path := r.URL.Path
-	userID := ""
-	if len(path) > len("/users/") {
-		endIndex := len(path) - len("/tweets")
-		if endIndex > len("/users/") {
-			userID = path[len("/users/"):endIndex]
-		}
-	}
+	userID := extractUserIDFromPath(r.URL.Path, "/tweets")
 
 	if userID == "" {
 		writeError(w, http.StatusBadRequest, "userID parameter is required")
@@ -240,14 +241,7 @@ func (h *Handlers) UnfollowUser(w http.ResponseWriter, r *http.Request) {
 // GetFollowers gets the followers of a user
 func (h *Handlers) GetFollowers(w http.ResponseWriter, r *http.Request) {
 	// Extract userID from path (format: /users/{userID}/followers)
-	path := r.URL.Path
-	userID := ""
-	if len(path) > len("/users/") {
-		endIndex := len(path) - len("/followers")
-		if endIndex > len("/users/") {
-			userID = path[len("/users/"):endIndex]
-		}
-	}
+	userID := extractUserIDFromPath(r.URL.Path, "/followers")
 
 	if userID == "" {
 		writeError(w, http.StatusBadRequest, "userID parameter is required")
@@ -266,14 +260,7 @@ func (h *Handlers) GetFollowers(w http.ResponseWriter, r *http.Request) {
 // GetFollowing gets the users that a user follows
 func (h *Handlers) GetFollowing(w http.ResponseWriter, r *http.Request) {
 	// Extract userID from path (format: /users/{userID}/following)
-	path := r.URL.Path
-	userID := ""
-	if len(path) > len("/users/") {
-		endIndex := len(path) - len("/following")
-		if endIndex > len("/users/") {
-			userID = path[len("/users/"):endIndex]
-		}
-	}
+	userID := extractUserIDFromPath(r.URL.Path, "/following")
 
 	if userID == "" {
 		writeError(w, http.StatusBadRequest, "userID parameter is required")
