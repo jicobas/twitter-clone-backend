@@ -49,7 +49,7 @@ Para el cache de timelines elegimos **Redis** sobre otras alternativas por razon
 
 **📈 Escalabilidad:**
 - **Redis Cluster**: Sharding automático por user ID
-- **Replicación**: Alta disponibilidad con maestro-esclavo
+- **Replicación**: Alta disponibilidad con master-slave
 
 Esta elección es crucial para la **optimización de lecturas** que requiere Twitter, donde cada usuario consulta su timeline frecuentemente. Para entender cuales son las configuraciones adecuadas debemos realizar una prueba de carga para entender efectivamente cuantos recursos se necesitan. Tenemos vencimiento por TTL y por actualizaciones.
 
@@ -91,7 +91,7 @@ MongoDB permite crear índices compuestos específicos para cada patrón de acce
 ## 🔧 Stack Tecnológico
 
 - **Go 1.21** - Lenguaje principal (performance + concurrencia)
-- **net/http** - Servidor HTTP (sin dependencias externas)
+- **net/http** - Servidor HTTP
 - **In-Memory** - Storage con thread-safety (MVP)
 - **MongoDB** - Base de datos principal
 - **Redis** - Cache layer para timelines
